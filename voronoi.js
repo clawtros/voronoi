@@ -39,9 +39,12 @@
                 sy = self.canvas.height / self.canvas.offsetHeight;
             self.points.push(new Point(event.offsetX * sx,
                                        event.offsetY * sy,
-                                       parseInt(Math.random() * 255, 10),
-                                       parseInt(Math.random() * 255, 10),
-                                       parseInt(Math.random() * 255, 10)))
+                                       self.points[0].r,
+                                       self.points[0].g,
+                                       self.points[0].b))
+            self.points[0].r = parseInt(Math.random() * 255, 10);
+            self.points[0].g = parseInt(Math.random() * 255, 10);
+            self.points[0].b = parseInt(Math.random() * 255, 10);
             self.draw();
           }
         })(this));
