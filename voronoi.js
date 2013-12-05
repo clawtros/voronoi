@@ -1,5 +1,5 @@
 (function(context) {
-  var INITIAL_POINTS = 10;
+  var INITIAL_POINTS = 3;
 
   var Point = function(x, y, r, g, b) {
     this.x = x;
@@ -18,8 +18,7 @@
       ctx.save();
       ctx.strokeStyle = 'black';
       ctx.fillStyle = 'rgb(' + this.r + ', ' + this.g + ', ' + this.b + ')';
-      ctx.fillRect(this.x, this.y, 10, 10);
-      ctx.strokeRect(this.x, this.y, 10, 10);
+      ctx.fillRect(this.x, this.y, 100, 100);
       ctx.restore();
     }
   };
@@ -33,6 +32,35 @@
 
   Sim.prototype = {
     initialize: function() {
+      this.canvas.addEventListener('click', (
+        function(self) {
+          return function(event) {
+            var sx = self.canvas.width / self.canvas.offsetWidth,
+                sy = self.canvas.height / self.canvas.offsetHeight;
+            self.points.push(new Point(event.offsetX * sx,
+                                       event.offsetY * sy,
+                                       parseInt(Math.random() * 255, 10),
+                                       parseInt(Math.random() * 255, 10),
+                                       parseInt(Math.random() * 255, 10)))
+            self.draw();
+          }
+        })(this));
+      this.canvas.addEventListener('mousemove', (
+        function(self) {
+          return function(event) {
+            if (self.points) {
+              var sx = self.canvas.width / self.canvas.offsetWidth,
+                  sy = self.canvas.height / self.canvas.offsetHeight;
+              self.points[self.points.length - 1] = new Point(event.offsetX * sx,
+                                         event.offsetY * sy,
+                                         255,
+                                         255,
+                                         255);
+              self.draw();
+            }
+          }
+        })(this));
+
       for (var i = 0; i < INITIAL_POINTS; i++) {
         var newPoint = new Point(Math.random() * this.canvas.width,
                                  Math.random() * this.canvas.height,
@@ -55,10 +83,11 @@
     },
 
     draw: function() {
-      for (var i = 0; i < this.canvas.width; i++) {
-        for (var j = 0;  j < this.canvas.height; j++) {
+      for (var i = 0; i < this.canvas.height; i++) {
+        for (var j = 0;  j < this.canvas.width; j++) {
           var distances = [],
-              minDistance = Infinity;
+              minDistance = Infinity,
+              closest = undefined;
 
           for (var x = 0, l = this.points.length; x < l; x++) {
             var point = this.points[x],
@@ -67,12 +96,14 @@
             distances.push({ point: point, distance: distance });
             if (distance < minDistance) {
               minDistance = distance;
+              closest = point;
             }
           }
-          var r = 0, g = 0, b = 0, normalizer = this.points.length;
+          var r = 0, g = 0, b = 0, averageDistance = 0, normalizer = this.points.length;
 
           for (x = 0, l = distances.length; x < l; x++) {
-            var weight = minDistance / (distances[x].distance);
+            var weight = 1 - (minDistance / (distances[x].distance));
+            averageDistance += weight;
             r += weight * distances[x].point.r;
             g += weight * distances[x].point.g;
             b += weight * distances[x].point.b;
@@ -82,9 +113,6 @@
         }
       }
 
-      for (var p = 0, l = this.points.length; i < l; i++) {
-        this.points[p].draw(this.ctx);
-      }
     }
   };
 
