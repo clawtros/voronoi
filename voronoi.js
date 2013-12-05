@@ -45,21 +45,9 @@
             self.draw();
           }
         })(this));
-      this.canvas.addEventListener('mousemove', (
-        function(self) {
-          return function(event) {
-            if (self.points) {
-              var sx = self.canvas.width / self.canvas.offsetWidth,
-                  sy = self.canvas.height / self.canvas.offsetHeight;
-              self.points[self.points.length - 1] = new Point(event.offsetX * sx,
-                                         event.offsetY * sy,
-                                         255,
-                                         255,
-                                         255);
-              self.draw();
-            }
-          }
-        })(this));
+
+      this.canvas.addEventListener('mousemove', this.moveHandler(this));
+      this.canvas.addEventListener('touchmove', this.moveHandler(this));
 
       for (var i = 0; i < INITIAL_POINTS; i++) {
         var newPoint = new Point(Math.random() * this.canvas.width,
@@ -68,6 +56,21 @@
                                  parseInt(Math.random() * 255, 10),
                                  parseInt(Math.random() * 255, 10));
         this.points.push(newPoint);
+      }
+    },
+
+    moveHandler: function(self) {
+      return function(event) {
+        if (self.points) {
+          var sx = self.canvas.width / self.canvas.offsetWidth,
+              sy = self.canvas.height / self.canvas.offsetHeight;
+          self.points[self.points.length - 1] = new Point(event.offsetX * sx,
+                                                          event.offsetY * sy,
+                                                          255,
+                                                          255,
+                                                          255);
+          self.draw();
+        }
       }
     },
 
