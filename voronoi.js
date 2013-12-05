@@ -64,11 +64,8 @@
         if (self.points) {
           var sx = self.canvas.width / self.canvas.offsetWidth,
               sy = self.canvas.height / self.canvas.offsetHeight;
-          self.points[self.points.length - 1] = new Point(event.offsetX * sx,
-                                                          event.offsetY * sy,
-                                                          255,
-                                                          255,
-                                                          255);
+          self.points[0].x = event.offsetX * sx;
+          self.points[0].y = event.offsetY * sy;
           self.draw();
         }
       }
