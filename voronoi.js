@@ -1,5 +1,6 @@
 (function(context) {
-  var INITIAL_POINTS = 3;
+  var INITIAL_POINTS = 3,
+      MIN_WEIGHT = 0;
 
   var Point = function(x, y, r, g, b) {
     this.x = x;
@@ -12,14 +13,8 @@
     distanceTo: function (x1, y1) {
       var dx = this.x - x1,
           dy = this.y - y1;
-      return Math.sqrt(dx*dx + dy*dy);
-    },
-    draw: function(ctx) {
-      ctx.save();
-      ctx.strokeStyle = 'black';
-      ctx.fillStyle = 'rgb(' + this.r + ', ' + this.g + ', ' + this.b + ')';
-      ctx.fillRect(this.x, this.y, 100, 100);
-      ctx.restore();
+      return dx*dx + dy*dy;
+
     }
   };
 
@@ -78,14 +73,11 @@
       this.draw();
     },
 
-    drawPixel: function (x, y, r, g, b) {
-      this.ctx.save();
-      this.ctx.fillStyle = 'rgb(' + parseInt(r, 10) + ', ' + parseInt(g, 10) + ', ' + parseInt(b, 10) + ')';
-      this.ctx.fillRect(x, y, 1, 1);
-      this.ctx.restore();
-    },
-
     draw: function() {
+      var imageData = this.ctx.createImageData(this.canvas.width, this.canvas.height),
+          index = 0,
+          closestBalance = 1;
+
       for (var i = 0; i < this.canvas.height; i++) {
         for (var j = 0;  j < this.canvas.width; j++) {
           var distances = [],
@@ -102,19 +94,27 @@
               closest = point;
             }
           }
-          var r = 0, g = 0, b = 0, averageDistance = 0, normalizer = this.points.length;
+          var r = 0, g = 0, b = 0, normalizer = 1;
 
           for (x = 0, l = distances.length; x < l; x++) {
+
             var weight = 1 - (minDistance / (distances[x].distance));
-            averageDistance += weight;
-            r += weight * distances[x].point.r;
-            g += weight * distances[x].point.g;
-            b += weight * distances[x].point.b;
+            if (weight > MIN_WEIGHT) {
+              r += weight * distances[x].point.r;
+              g += weight * distances[x].point.g;
+              b += weight * distances[x].point.b;
+              normalizer += 1;
+              }
           }
 
-          this.drawPixel(j, i, r / normalizer, g / normalizer, b / normalizer);
+          imageData.data[index++] = parseInt((r * closestBalance / normalizer) + (1 - closestBalance) * closest.r, 10);
+          imageData.data[index++] = parseInt((g * closestBalance / normalizer) + (1 - closestBalance) * closest.g, 10);
+          imageData.data[index++] = parseInt((b * closestBalance / normalizer) + (1 - closestBalance) * closest.b, 10);
+          imageData.data[index++] = 255;
+
         }
       }
+      this.ctx.putImageData(imageData, 0, 0);
 
     }
   };
