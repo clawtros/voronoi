@@ -3,6 +3,20 @@
   <head>
     <title>Voronoi Thing</title>
     <link rel="stylesheet" href="foundation.min.css">
+    <style>
+     .space {
+       margin-top: 20px;
+     }
+     .fullscreen {
+       position: fixed;
+       top: 0;
+       right: 0;
+       left: 0;
+       bottom: 0;
+       height:100%;
+       width: 100%;
+     }
+    </style>
   </head>
   <body>
     <div class="row">
@@ -11,11 +25,47 @@
       </div>
       <canvas id="c" width="380" height="200" class="large-12 columns"></canvas>
     </div>
-    <script type="application/javascript" src="voronoi.js"></script>
-    <script type="application/javascript">
-      var sim = new Sim(document.getElementById('c'));
-      sim.initialize();
-      sim.start();
-    </script>
+    <div class="space">
+    </div>
+    <div class="row">
+      <div class="large-3 columns">
+	<label>Closest Balance</label>
+	<input type="range" value="1" min="0" max="1" step="0.05" id="closestInput">
+      </div>
+      <div class="large-3 columns">
+	<label>Minimum Weight</label>
+	<input type="range" value="0" min="0" max="1" step="0.05" id="minWeightInput">
+      </div>
+      <div class="large-6 columns">
+	<button class="" id="fullscreenButton">Toggle Fullscreen</button>
+      </div>
+      <script type="application/javascript" src="voronoi.js"></script>
+      <script type="application/javascript">
+       var sim = new Sim(document.getElementById('c'));
+       sim.initialize();
+       sim.start();
+
+       document.getElementById('closestInput').addEventListener('input', function(e) {
+	 var parsed = parseFloat(this.value);
+	 sim.closestBalance = parsed;
+	 sim.draw();
+       });
+
+       document.getElementById('minWeightInput').addEventListener('input', function(e) {
+	 var parsed = parseFloat(this.value);
+	 sim.minWeight = parsed;
+	 sim.draw();
+       });
+
+       document.getElementById('fullscreenButton').addEventListener('click', function(e) {
+	 if (document.getElementById('c').getAttribute('class') != 'fullscreen') {
+	   document.getElementById('c').setAttribute('class', 'fullscreen');	   
+	 } else {
+	   document.getElementById('c').setAttribute('class', 'large-12 columns');	   
+	 }
+
+       });
+								
+      </script>
   </body>
 </html>

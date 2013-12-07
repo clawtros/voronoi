@@ -1,6 +1,6 @@
 (function(context) {
-  var INITIAL_POINTS = 3,
-      MIN_WEIGHT = 0;
+
+  var INITIAL_POINTS = 3;
 
   var Point = function(x, y, r, g, b) {
     this.x = x;
@@ -23,6 +23,8 @@
     this.ctx = canvas.getContext('2d');
     this.canvasData = this.ctx.getImageData(0, 0, canvas.width, canvas.height);
     this.points = [];
+    this.closestBalance = 1;
+    this.minWeight = 0;
   };
 
   Sim.prototype = {
@@ -75,8 +77,7 @@
 
     draw: function() {
       var imageData = this.ctx.createImageData(this.canvas.width, this.canvas.height),
-          index = 0,
-          closestBalance = 1;
+          index = 0;
 
       for (var i = 0; i < this.canvas.height; i++) {
         for (var j = 0;  j < this.canvas.width; j++) {
@@ -99,7 +100,7 @@
           for (x = 0, l = distances.length; x < l; x++) {
 
             var weight = 1 - (minDistance / (distances[x].distance));
-            if (weight > MIN_WEIGHT) {
+            if (weight > this.minWeight) {
               r += weight * distances[x].point.r;
               g += weight * distances[x].point.g;
               b += weight * distances[x].point.b;
@@ -107,9 +108,9 @@
               }
           }
 
-          imageData.data[index++] = parseInt((r * closestBalance / normalizer) + (1 - closestBalance) * closest.r, 10);
-          imageData.data[index++] = parseInt((g * closestBalance / normalizer) + (1 - closestBalance) * closest.g, 10);
-          imageData.data[index++] = parseInt((b * closestBalance / normalizer) + (1 - closestBalance) * closest.b, 10);
+          imageData.data[index++] = parseInt((r * this.closestBalance / normalizer) + (1 - this.closestBalance) * closest.r, 10);
+          imageData.data[index++] = parseInt((g * this.closestBalance / normalizer) + (1 - this.closestBalance) * closest.g, 10);
+          imageData.data[index++] = parseInt((b * this.closestBalance / normalizer) + (1 - this.closestBalance) * closest.b, 10);
           imageData.data[index++] = 255;
 
         }
